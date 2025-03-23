@@ -14,24 +14,24 @@
 #include <QMessageBox>
 #include <QPushButton>
 
-void error_msg(QString error_msg_content) {
+void error_msg(QString error_msg_content){
     QMessageBox debug_msgbx;
     debug_msgbx.setStyleSheet("QMessageBox {background-color:red;}");
     debug_msgbx.setText(error_msg_content);
     debug_msgbx.exec();
 }
 
-void add_fav_fn(std::string fav_start_ip_fnvar, std::string target_ip_fnvar) {
+void add_fav_fn(std::string fav_start_ip_fnvar, std::string target_ip_fnvar){
     std::ofstream fout("data/fav_data.csv", std::ios::app);    
-    if (!fout.is_open()) { error_msg("data file cannot be open"); fout.close(); }
+    if(!fout.is_open()) { error_msg("data file cannot be open"); fout.close(); }
 
     fout << "\n" + fav_start_ip_fnvar + " - " + target_ip_fnvar;
-    if (fout.fail()) { error_msg("write error"); fout.close(); }
+    if(fout.fail()) { error_msg("write error"); fout.close(); }
 }
 
-void read_fav_fn(QWidget &main_window_fnvar) {
+void read_fav_fn(QWidget &main_window_fnvar){
     std::ifstream fin("data/fav_data.csv");
-    if (!fin.is_open()) { error_msg("data file cannot be open"); fin.close(); }
+    if(!fin.is_open()){error_msg("data file cannot be open"); fin.close();}
 
     std::string line;
     std::string read_value;
@@ -40,7 +40,7 @@ void read_fav_fn(QWidget &main_window_fnvar) {
     QList<QString> fav_ip_array;
 
     int read_fav_fn_counter = 0;
-    while (std::getline(fin, line)) {
+    while(std::getline(fin, line)){
         read_value = line;
         QString fav_ip_cnv_value = QString::fromLocal8Bit(read_value.c_str());
         fav_ip_array.append(fav_ip_cnv_value);
@@ -49,16 +49,16 @@ void read_fav_fn(QWidget &main_window_fnvar) {
         read_fav_fn_counter++;
     }
 
-    if (fin.fail() && !fin.eof()) { error_msg("read error"); fin.close(); }
+    if(fin.fail() && !fin.eof()){error_msg("read error"); fin.close();}
 }
 
-void delay_fn() {
+void delay_fn(){
     QTime dieTime = QTime::currentTime().addMSecs(1);
     while (QTime::currentTime() < dieTime)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
 }
 
-QString your_ip_fn() {
+QString your_ip_fn(){
     QProcess process_userip;
     process_userip.start("bash", QStringList() << "-c" << "bash script/usr_ip.sh");
     process_userip.waitForFinished();
@@ -67,7 +67,7 @@ QString your_ip_fn() {
     return your_ip_var;
 }
 
-QString system_fn(QString script_file_path, QString completed_finish_parameter) {
+QString system_fn(QString script_file_path, QString completed_finish_parameter){
     QProcess process_system;
     process_system.start("bash", QStringList() << "-c" << "bash " + script_file_path + ".sh " + completed_finish_parameter);
     process_system.waitForFinished();
@@ -76,7 +76,7 @@ QString system_fn(QString script_file_path, QString completed_finish_parameter) 
     return result;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]){
     QApplication a(argc, argv);
 
     QWidget main_window;
@@ -141,13 +141,13 @@ int main(int argc, char *argv[]) {
     clear_list_bttn->setGeometry(260, 130, 200, 30);
     clear_list_bttn->setStyleSheet("background-color:red; color:white;");
 
-    QObject::connect(favourites_button, &QPushButton::clicked, [&]() {
+    QObject::connect(favourites_button, &QPushButton::clicked, [&](){
         favourites_window.setStyleSheet("QWidget {background-color:#F2F2F2;}");
         favourites_window.setWindowTitle("Favourites");
 
         read_fav_fn(favourites_window);
 
-        QObject::connect(add_fav_bttn, &QPushButton::clicked, [&]() {
+        QObject::connect(add_fav_bttn, &QPushButton::clicked, [&](){
             std::string start_ip_fav_val_std = start_ip_fav_txtbx_start->toPlainText().toStdString();
             std::string target_ip_fav_val_std = start_ip_fav_txtbx_target->toPlainText().toStdString();
 
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
             favourites_window.show();
         });
 
-        QObject::connect(clear_list_bttn, &QPushButton::clicked, [&]() {
+        QObject::connect(clear_list_bttn, &QPushButton::clicked, [&](){
             system_fn("script/clear_list", "");
 
             favourites_window.close();
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
         favourites_window.show();
     });
 
-    QObject::connect(scan_button, &QPushButton::clicked, [&]() {
+    QObject::connect(scan_button, &QPushButton::clicked, [&](){
         write_list->clear();
 
         QString values = start_ip_var->toPlainText() + ".";
@@ -179,7 +179,7 @@ int main(int argc, char *argv[]) {
         QStringList floor_1;
         int counter_dat_finder_1 = 0;
         int ip_char_1 = 0;
-        while (values.at(counter_dat_finder_1) != ".") {
+        while(values.at(counter_dat_finder_1) != "."){
             counter_dat_finder_1++;
             floor_1.append(values.at(ip_char_1));
             ip_char_1++;
@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
         QStringList floor_2;
         int counter_dat_finder_2 = counter_dat_finder_1 + 1;
         int ip_char_2 = ip_char_1 + 1;
-        while (values.at(counter_dat_finder_2) != ".") {
+        while(values.at(counter_dat_finder_2) != "."){
             counter_dat_finder_2++;
             floor_2.append(values.at(ip_char_2));
             ip_char_2++;
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
         QStringList floor_3;
         int counter_dat_finder_3 = counter_dat_finder_2 + 1;
         int ip_char_3 = ip_char_2 + 1;
-        while (values.at(counter_dat_finder_3) != ".") {
+        while(values.at(counter_dat_finder_3) != "."){
             counter_dat_finder_3++;
             floor_3.append(values.at(ip_char_3));
             ip_char_3++;
@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
         QStringList floor_4;
         int counter_dat_finder_4 = counter_dat_finder_3 + 1;
         int ip_char_4 = ip_char_3 + 1;
-        while (values.at(counter_dat_finder_4) != ".") {
+        while(values.at(counter_dat_finder_4) != "."){
             counter_dat_finder_4++;
             floor_4.append(values.at(ip_char_4));
             ip_char_4++;
@@ -219,28 +219,28 @@ int main(int argc, char *argv[]) {
         int success_ip_counter = 0;
         bool first_match_query = false;
         bool stoper = false;
-        while (true) {
+        while(true){
             delay_fn();
 
-            if (first_match_query == false) { goto first_match_l; }
+            if(first_match_query == false){goto first_match_l;}
             convert_4++;
-            if (convert_4 == 256) {
+            if(convert_4 == 256){
                 convert_4 = 0;
                 convert_3++;
-                if (convert_3 == 256) {
+                if (convert_3 == 256){
                     convert_3 = 0;
                     convert_2++;
-                    if (convert_2 == 256) {
+                    if (convert_2 == 256){
                         convert_2 = 0;
                         convert_1++;
-                        if (convert_1 == 256) {
+                        if (convert_1 == 256){
                             convert_1 = 0;
                         }
                     }
                 }
             }
 
-        first_match_l:
+	    first_match_l:
             first_match_query = true;
             QString completed_1 = QString::number(convert_1);
             QString completed_2 = QString::number(convert_2);
@@ -255,12 +255,12 @@ int main(int argc, char *argv[]) {
 
             QListWidgetItem *write_object = new QListWidgetItem();
 
-            if (ping_port != "64") {
+            if(ping_port != "64"){
                 QPixmap pixmap("img/ip-false.png");
                 QIcon icon(pixmap);
                 write_object->setIcon(icon);
                 write_object->setText(compile_value);
-            } else {
+            }else{
                 success_ip_counter++;
                 QPixmap pixmap("img/ip-true.png");
                 QIcon icon(pixmap);
@@ -270,14 +270,14 @@ int main(int argc, char *argv[]) {
 
             write_list->addItem(write_object);    
 
-            if (completed_finish == target) {
+            if(completed_finish == target){
                 QMessageBox success_value_msgbx;
                 QString success_value_cvrt = QString::number(success_ip_counter);
                 success_value_msgbx.setStyleSheet("QMessageBox {background-color:green;}");
                 success_value_msgbx.setText("Successful IP Count; " + success_value_cvrt);
                 success_value_msgbx.exec();
                 break;
-            } else if (stoper == true) {
+            }else if(stoper == true){
                 QMessageBox success_value_msgbx;
                 QString success_value_cvrt = QString::number(success_ip_counter);
                 success_value_msgbx.setStyleSheet("QMessageBox {background-color:green;}");
@@ -285,7 +285,7 @@ int main(int argc, char *argv[]) {
                 success_value_msgbx.exec();
                 break;
             }
-            QObject::connect(stop_button, &QPushButton::clicked, [&]() {
+            QObject::connect(stop_button, &QPushButton::clicked, [&](){
                 stoper = true;
             });
         }    
