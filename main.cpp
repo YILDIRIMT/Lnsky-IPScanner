@@ -21,17 +21,42 @@ void error_msg(QString error_msg_content){
     debug_msgbx.exec();
 }
 
+bool ip_floor_length(int ip_floor_length_parameter_1, int ip_floor_length_parameter_2, int ip_floor_length_parameter_3){
+    if(ip_floor_length_parameter_1 - ip_floor_length_parameter_2 - ip_floor_length_parameter_3 > 3){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool ip_floor_value_size(int ip_floor_value_size_parameter_1){
+    if(ip_floor_value_size_parameter_1 > 255){
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void add_fav_fn(std::string fav_start_ip_fnvar, std::string target_ip_fnvar){
     std::ofstream fout("data/fav_data.csv", std::ios::app);    
-    if(!fout.is_open()) { error_msg("data file cannot be open"); fout.close(); }
+    if(!fout.is_open()){
+        error_msg("Data file cannot be open");
+        fout.close();
+    }
 
     fout << "\n" + fav_start_ip_fnvar + " - " + target_ip_fnvar;
-    if(fout.fail()) { error_msg("write error"); fout.close(); }
+    if(fout.fail()){
+        error_msg("Write error");
+        fout.close();
+    }
 }
 
 void read_fav_fn(QWidget &main_window_fnvar){
     std::ifstream fin("data/fav_data.csv");
-    if(!fin.is_open()){error_msg("data file cannot be open"); fin.close();}
+    if(!fin.is_open()){
+        error_msg("Data file cannot be open");
+        fin.close();
+    }
 
     std::string line;
     std::string read_value;
@@ -48,8 +73,10 @@ void read_fav_fn(QWidget &main_window_fnvar){
         fav_listfav_list->addItem(fav_ip_array[read_fav_fn_counter]);
         read_fav_fn_counter++;
     }
-
-    if(fin.fail() && !fin.eof()){error_msg("read error"); fin.close();}
+    if(fin.fail() && !fin.eof()){
+        error_msg("read error");
+        fin.close();
+    }
 }
 
 void delay_fn(){
@@ -86,7 +113,6 @@ int main(int argc, char *argv[]){
     main_window.setWindowTitle("LNSky - IP Scanner");
 
     // main window items
-	
     QPushButton *tool_bar_bg = new QPushButton("----------", &main_window);
     tool_bar_bg->setStyleSheet("QPushButton {width: 10000%; margin-left:-10px; background-color:white;}");
     tool_bar_bg->setEnabled(false);
@@ -124,7 +150,6 @@ int main(int argc, char *argv[]){
     stop_button->setStyleSheet("QPushButton {background-color:red; color:white;}");
 
     // favourites window items
-
     QTextEdit *start_ip_fav_txtbx_start  = new QTextEdit(&favourites_window);
     start_ip_fav_txtbx_start->setGeometry(260, 10, 200, 30);
     start_ip_fav_txtbx_start->setPlaceholderText("Start IP : 0.0.0.0");
@@ -171,8 +196,9 @@ int main(int argc, char *argv[]){
     });
 
     QObject::connect(scan_button, &QPushButton::clicked, [&](){
+        bool wrong_input = false;
+        bool stoper = false;
         write_list->clear();
-
         QString values = start_ip_var->toPlainText() + ".";
         QString target = target_ip_var->toPlainText();
 
@@ -184,8 +210,13 @@ int main(int argc, char *argv[]){
             floor_1.append(values.at(ip_char_1));
             ip_char_1++;
         }
-        QString ip_floor_string_1 = floor_1.join(""); int convert_1 = ip_floor_string_1.toInt();
-        //
+        wrong_input = ip_floor_length(counter_dat_finder_1, 0, 0);
+        stoper = ip_floor_length(counter_dat_finder_1, 0, 0);
+        QString ip_floor_string_1 = floor_1.join(""); 
+        int convert_1 = ip_floor_string_1.toInt();        
+        wrong_input = ip_floor_value_size(convert_1);
+        stoper = ip_floor_value_size(convert_1);
+
         QStringList floor_2;
         int counter_dat_finder_2 = counter_dat_finder_1 + 1;
         int ip_char_2 = ip_char_1 + 1;
@@ -194,7 +225,14 @@ int main(int argc, char *argv[]){
             floor_2.append(values.at(ip_char_2));
             ip_char_2++;
         }
-        QString ip_floor_string_2 = floor_2.join(""); int convert_2 = ip_floor_string_2.toInt();
+        QString ip_floor_string_2 = floor_2.join(""); 
+        int convert_2 = ip_floor_string_2.toInt();
+        if(wrong_input == false){
+            wrong_input = ip_floor_length(counter_dat_finder_2, counter_dat_finder_1, 1);
+            stoper = ip_floor_length(counter_dat_finder_2, counter_dat_finder_1, 1);
+            wrong_input = ip_floor_value_size(convert_2);
+            stoper = ip_floor_value_size(convert_2);        	
+        }
         //
         QStringList floor_3;
         int counter_dat_finder_3 = counter_dat_finder_2 + 1;
@@ -204,49 +242,85 @@ int main(int argc, char *argv[]){
             floor_3.append(values.at(ip_char_3));
             ip_char_3++;
         }
-        QString ip_floor_string_3 = floor_3.join(""); int convert_3 = ip_floor_string_3.toInt();
+        QString ip_floor_string_3 = floor_3.join(""); 
+        int convert_3 = ip_floor_string_3.toInt();
+        if(wrong_input == false){
+            wrong_input = ip_floor_length(counter_dat_finder_3, counter_dat_finder_2, 1);
+            stoper = ip_floor_length(counter_dat_finder_3, counter_dat_finder_2, 1);        
+            wrong_input = ip_floor_value_size(convert_3);
+            stoper = ip_floor_value_size(convert_3);        	
+        }
         //
         QStringList floor_4;
         int counter_dat_finder_4 = counter_dat_finder_3 + 1;
         int ip_char_4 = ip_char_3 + 1;
         while(values.at(counter_dat_finder_4) != "."){
-            counter_dat_finder_4++;
+            counter_dat_finder_4++;          
             floor_4.append(values.at(ip_char_4));
             ip_char_4++;
         }
-        QString ip_floor_string_4 = floor_4.join(""); int convert_4 = ip_floor_string_4.toInt();
+        QString ip_floor_string_4 = floor_4.join(""); 
+        int convert_4 = ip_floor_string_4.toInt();
+        if(wrong_input == false){
+            wrong_input = ip_floor_length(counter_dat_finder_4, counter_dat_finder_3, 1);
+            stoper = ip_floor_length(counter_dat_finder_4, counter_dat_finder_3, 1);
+            wrong_input = ip_floor_value_size(convert_4);
+            stoper = ip_floor_value_size(convert_4);
+        }
 
         int success_ip_counter = 0;
         bool first_match_query = false;
-        bool stoper = false;
         while(true){
             delay_fn();
-
-            if(first_match_query == false){goto first_match_l;}
+            if(first_match_query == false){
+                goto first_match_l;
+            }
             convert_4++;
             if(convert_4 == 256){
                 convert_4 = 0;
                 convert_3++;
-                if (convert_3 == 256){
+                if(convert_3 == 256){
                     convert_3 = 0;
                     convert_2++;
-                    if (convert_2 == 256){
+                    if(convert_2 == 256){
                         convert_2 = 0;
                         convert_1++;
-                        if (convert_1 == 256){
+                        if(convert_1 == 256){
                             convert_1 = 0;
                         }
                     }
                 }
             }
-
-	    first_match_l:
+            first_match_l:
             first_match_query = true;
             QString completed_1 = QString::number(convert_1);
             QString completed_2 = QString::number(convert_2);
             QString completed_3 = QString::number(convert_3);
             QString completed_4 = QString::number(convert_4);
             QString completed_finish = completed_1 + "." + completed_2 + "." + completed_3 + "." + completed_4;
+
+            QString query_finish = completed_1 + completed_2 + completed_3 + completed_4;
+            int query_finish_converter = query_finish.toInt();
+
+            QString test_target = target + "x";
+
+            QStringList test_1;
+            int counter_test = 0;
+            while(test_target.at(counter_test) != "x"){
+                if(target.at(counter_test) == "."){
+                    counter_test++;
+                    continue;            		
+                }
+                test_1.append(target.at(counter_test));
+                counter_test++;
+            }
+            QString compile_target = test_1.join("");
+            int compile_target_converter = compile_target.toInt();
+
+            if(query_finish_converter > compile_target_converter){
+                wrong_input = true;
+                stoper = true;
+            }
 
             QString host_and_ms_port = system_fn("script/find_hostname", completed_finish);
             QString ping_port = system_fn("script/find_port", completed_finish);
@@ -260,7 +334,7 @@ int main(int argc, char *argv[]){
                 QIcon icon(pixmap);
                 write_object->setIcon(icon);
                 write_object->setText(compile_value);
-            }else{
+            }else {
                 success_ip_counter++;
                 QPixmap pixmap("img/ip-true.png");
                 QIcon icon(pixmap);
@@ -278,6 +352,10 @@ int main(int argc, char *argv[]){
                 success_value_msgbx.exec();
                 break;
             }else if(stoper == true){
+                if(wrong_input == true){
+                    error_msg("Wrong Scala");
+                    break;
+                }
                 QMessageBox success_value_msgbx;
                 QString success_value_cvrt = QString::number(success_ip_counter);
                 success_value_msgbx.setStyleSheet("QMessageBox {background-color:green;}");
@@ -290,9 +368,7 @@ int main(int argc, char *argv[]){
             });
         }    
     });
-
     main_window.resize(500, 300);
     main_window.show();
-
     return a.exec();
 }
