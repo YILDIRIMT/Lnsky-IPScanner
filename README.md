@@ -1,11 +1,11 @@
 # Lnsky-IPScanner
 IP Scanning software on local network
 
-### Dependencies
+### Start Setup
 
-* `qt5`, `net-tools`
+`sudo bash setup.sh`
 
-![Screenshot from 2025-03-17 01-17-34](https://github.com/user-attachments/assets/93a34d43-fbe3-4621-8236-fb86142475bb)
+![Ekran görüntüsü_2025-05-14_01-08-52](https://github.com/user-attachments/assets/4a8e9825-c7d1-438f-998c-4d4ceb738494)
 ![Screenshot from 2025-03-17 01-21-11](https://github.com/user-attachments/assets/abc75f67-5ed6-4ef8-beb4-f8de1738d581)
 
 ## Authors and Contributors
