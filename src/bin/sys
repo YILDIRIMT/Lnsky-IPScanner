@@ -1,0 +1,3 @@
+cd /opt/Lnsky/
+make run
+cd ..
