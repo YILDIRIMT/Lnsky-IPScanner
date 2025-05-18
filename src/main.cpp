@@ -16,6 +16,14 @@
 #include <QTimer>
 #include <vector>
 
+std::string std_join(const std::vector<std::string> & v, const std::string & delimiter = ", ") {
+    std::string result;
+    for(size_t i = 0; i < v.size(); ++i){
+        result += (i ? delimiter : "") + v[i];
+    }
+    return result;
+}
+
 void wait(int ms){
 	//delay
     QEventLoop loop;
@@ -289,17 +297,25 @@ int main(int argc, char *argv[]){
 	   	}
 	});
 	
+	bool stoper = false;
+	QStringList success_ip_list;	
+ 	int second_counter = 0;
+	static QTimer *second_timer = nullptr;
+	second_timer = new QTimer;
+	QObject::connect(second_timer, &QTimer::timeout, [&](){second_counter++;});
+
+	QObject::connect(stop_button, &QPushButton::clicked, [&](){stoper = true;});
 	//EVENT_SCAN_BUTTON_CLICKED
     QObject::connect(scan_button, &QPushButton::clicked, [&](){
+    	second_counter = 0;
+    	second_timer->stop();
+    	success_ip_list.clear();
     	if(!start_ip_var->document()->isEmpty() && !target_ip_var->document()->isEmpty()){
+    		stoper = false;
     		bool error = false;
-        	bool stoper = false;
         	
         	write_list->clear();
         	write_list_jsi->clear();
-
-        	QStringList success_ip_list;
-        	success_ip_list.clear();
         
         	QString values = start_ip_var->toPlainText() + ".";
         	QString target = target_ip_var->toPlainText();
@@ -355,24 +371,14 @@ int main(int argc, char *argv[]){
         	int success_ip_counter = 0;
         	bool first_match_query = false;
 
- 			//displayed timer       	
-       		static int second_counter = 0;
-        	static QTimer *second_timer = nullptr;
-    		second_timer = new QTimer;
-    		QObject::connect(second_timer, &QTimer::timeout, [&](){
-    			second_counter++;
-    		});
+ 			//displayed timer
     		second_timer->start(1000);
     		get_jsi->setHidden(true);
 		
         	while(true){
         		wait(0.1);
-            
-            	if(first_match_query == false){
-                	goto first_match_l;
-            	}
+            	if(first_match_query == false){goto first_match_l;}            	
             	//ip tour control and increment ip address
-            	//so ugly code ↓
             	convert_4++;
             	if(convert_4 == 256){
                 	convert_4 = 0;
@@ -388,9 +394,8 @@ int main(int argc, char *argv[]){
                         	}
                     	}
                 	}
-            	}
+            	}first_match_l:
             	
-            	first_match_l:
             	first_match_query = true;
             	QString completed_1 = QString::number(convert_1);
             	QString completed_2 = QString::number(convert_2);
@@ -398,26 +403,26 @@ int main(int argc, char *argv[]){
             	QString completed_4 = QString::number(convert_4);
             	//ip last result "nnn.nnn.nnn.nnn" 
             	QString completed_finish = completed_1 + "." + completed_2 + "." + completed_3 + "." + completed_4;
-						
+				
             	QString query_finish = completed_1 + completed_2 + completed_3 + completed_4;
-            	int query_finish_converter = query_finish.toInt();
+            	long long query_finish_converter = std::stoll(query_finish.toStdString());
+            	
 				//192.168.1.0   192.168.3.0
 				//target ip + controller("x")
             	QString test_target = target + "x";
-			
-            	QStringList test_1;
+				
+            	std::vector<std::string> test_1;
             	int counter_test = 0;
             	while(test_target[counter_test] != 'x'){
                 	if(target[counter_test] == '.'){
                     	counter_test++;
                     	continue;            		
                 	} 
-                	test_1.append(target[counter_test]);
+                	test_1.push_back(std::string(1, target[counter_test].toLatin1()));
                 	counter_test++;
             	}
-            	QString compile_target = test_1.join("");
-            	int compile_target_converter = compile_target.toInt();
-            	
+            	long long  compile_target_converter = std::stoll(std_join(test_1,""));
+				            	
             	if(query_finish_converter > compile_target_converter){
             		error = true;
             		get_jsi->setHidden(true);
@@ -470,7 +475,6 @@ int main(int argc, char *argv[]){
                 	success_value_msgbx.exec();
                 	break;
             	}
-            	QObject::connect(stop_button, &QPushButton::clicked, [&](){stoper = true;});
         	}
         	int success_ip_counter_wl = 0;
 
